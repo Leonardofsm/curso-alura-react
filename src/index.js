@@ -1,21 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
-import Sobre from './Sobre';
-import Autores from './Autores';
-import Livros from './Livros';
-import NotFound from './NotFound';
+import './index.css';
+import Home from './Pages/Home/Home';
+import Sobre from './Pages/Sobre/Sobre';
+import Livros from './Pages/Livros/Livros';
+import Autores from './Pages/Autores/Autores';
+import NotFound from './Pages/NotFound/NotFound';
 
+import * as serviceWorker from './serviceWorker';
 
 
 ReactDOM.render(
   <BrowserRouter>
     <Switch>
-      <Route path="/"exact={true} component={App} />
+      <Route path="/"exact={true} component={Home} />
       <Route path="/sobre" component={Sobre} />
       <Route path="/autores" component={Autores} />
       <Route path="/livros" component={Livros} />
