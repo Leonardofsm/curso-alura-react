@@ -3,6 +3,7 @@ import Header from './Header';
 
 import DataTable from './DataTable';
 import ApiService from './ApiService';
+import PopUp from './PopUp';
 
 class Autores extends Component {
 
@@ -18,9 +19,13 @@ class Autores extends Component {
 
     componentDidMount() {
       ApiService.ListaNomes()
-                .then(res => {
-                  this.setState({nomes: [...this.state.nomes, ...res.data]});
-                });
+                .then(res => ApiService.TrataErros(res))
+                .then(res => { 
+                    if(res.message === 'success') {
+                        this.setState({nomes: [...this.state.nomes, ...res.data]});
+                    }
+                })
+                .catch(err => PopUp.exibeMensagem('error', "Falha na comunicação na API para listar autores"));
     }
 
     render() {
