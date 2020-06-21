@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
+import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+
 import FormValidator from '../../Utils/FormValidator';
-import PopUp from '../../Utils/PopUp';
+import Toast from '../Toast/Toast';
 
 class Formulario extends Component {
 
@@ -23,7 +27,7 @@ class Formulario extends Component {
             {
                 campo: 'preco',
                 metodo: 'isInt',
-                args: [{min: 0, max: 99999}],
+                args: [{ min: 0, max: 99999 }],
                 validoQuando: true,
                 mensagem: 'Entre com um valor númerico'
             }
@@ -34,6 +38,11 @@ class Formulario extends Component {
             livro: '',
             preco: '',
             validacao: this.validador.valido(),
+            mensagem: {
+                open: false,
+                texto: '',
+                tipo: 'sucess' 
+            }
         }
 
         this.state = this.stateInicial;
@@ -52,21 +61,28 @@ class Formulario extends Component {
     submitFormulario = () => {
 
         const validacao = this.validador.valida(this.state);
-        if(validacao.isValid){
+        if (validacao.isValid) {
             this.props.escutadorDeSubmit(this.state);
-            //PopUp.exibeMensagem('success', 'Autor cadastrado com sucesso');
             this.setState(this.stateInicial);
         } else {
-            const {nome, livro, preco} = validacao;
+            const { nome, livro, preco } = validacao;
             const campos = [nome, livro, preco];
             const camposInvalidos = campos.filter(elem => {
                 return elem.isInvalid;
-            });
-            camposInvalidos.forEach(campo => {
-                PopUp.exibeMensagem('error', campo.message);
-            });
+            })
+            const erros = camposInvalidos.reduce(
+                (texto, campo) => texto + campo.message + '. ',
+                ''
+                )
+            this.setState({
+                mensagem: {
+                    open: true,
+                    texto: erros,
+                    tipo: 'error'
+                }
+            })
         }
-        
+
     }
 
 
@@ -75,48 +91,64 @@ class Formulario extends Component {
         const { nome, livro, preco } = this.state;
 
         return (
-            <form>
-                <div className="row">
-                    <div className="input-field col s4">
-                        <label className="input-field" htmlFor="nome">Nome</label>
-                        <input
-                            id="nome"
-                            type="text"
-                            name="nome"
-                            value={nome}
-                            onChange={this.escutadorDeImput}
-                            className="validate"
-                        />
-                    </div>
-                    <div className="input-field col s4">
-                        <label className="input-field" htmlFor="livro">Livro</label>
-                        <input
-                            id="livro"
-                            type="text"
-                            name="livro"
-                            value={livro}
-                            onChange={this.escutadorDeImput}
-                            className="validate"
-                        />
-                    </div>
-                    <div className="input-field col s4">
-                        <label className="input-field" htmlFor="preco">Preço</label>
-                        <input
-                            id="preco"
-                            type="text"
-                            name="preco"
-                            value={preco}
-                            onChange={this.escutadorDeImput}
-                            className="validate"
-                        />
-                    </div>
-                </div>
-
-                <button className="waves-effect waves-light btn blue lighten-2" onClick={this.submitFormulario} type="button">
-                    Salvar
-                </button>
-            </form>
-
+            <>
+                <Toast 
+                    open={this.state.mensagem.open}
+                    handleClose={() => this.setState({ 
+                        mensagem: {
+                            open: false
+                        } 
+                    })
+                }
+                severity={this.state.mensagem.tipo}
+                 >
+                    {this.state.mensagem.texto}    
+                </Toast>
+                <form>
+                    <Grid container spacing={2} alignItems='center'>
+                        <Grid item>
+                            <TextField
+                                id='nome'
+                                label='Nome'
+                                name='nome'
+                                variant='outlined'
+                                value={nome}
+                                onChange={this.escutadorDeImput}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <TextField
+                                id="livro"
+                                label="Livro"
+                                name="livro"
+                                variant="outlined"
+                                value={livro}
+                                onChange={this.escutadorDeImput}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <TextField
+                                id="preco"
+                                label="Preço"
+                                name="preco"
+                                variant="outlined"
+                                value={preco}
+                                onChange={this.escutadorDeImput}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <Button
+                                variant='contained'
+                                color='primary'
+                                onClick={this.submitFormulario}
+                                type="button"
+                            >
+                                Salvar
+                        </Button>
+                        </Grid>
+                    </Grid>
+                </form>
+            </>
         );
     }
 }
